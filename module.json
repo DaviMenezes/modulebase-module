@@ -1,0 +1,13 @@
+{
+    "name": "ModuleBase",
+    "alias": "modulebase",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\ModuleBase\\Providers\\ModuleBaseServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
