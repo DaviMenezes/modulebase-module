@@ -3,7 +3,6 @@
 namespace Modules\ModuleBase\Repository;
 
 use Modules\ModuleBase\Domain\DomainBase;
-use Modules\ModuleBase\Repository\RepositoryInterface;
 
 abstract class RepositoryBaseAbstract implements RepositoryInterface
 {
@@ -14,6 +13,4 @@ abstract class RepositoryBaseAbstract implements RepositoryInterface
     {
         $this->domain = $domain;
     }
-
-
 }

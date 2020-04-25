@@ -11,7 +11,7 @@ class RepositoryBase extends RepositoryBaseAbstract
     /**@var Model*/
     protected $model;
 
-    protected function model()
+    public function model()
     {
         $class = $this->domain->modelClass();
         return $this->model = $this->model ?? new $class();
@@ -21,7 +21,10 @@ class RepositoryBase extends RepositoryBaseAbstract
     public function all()
     {
         return $this->exec(function () {
-            return $this->domain->modelClass()::all();
+            $result = $this->domain->modelClass()::all();
+            $data['items'] = $result->toArray();
+            $data['total'] = $result->count();
+            return $data;
         });
     }
 
@@ -37,14 +40,21 @@ class RepositoryBase extends RepositoryBaseAbstract
     public function create(array $data)
     {
         return $this->exec(function () use ($data) {
-            return $this->domain->modelClass()::query()->create($data);
+            return $this->model = $this->domain->modelClass()::query()->create($data);
         });
     }
 
-    public function update($id, $data)
+    public function update($data)
     {
-        return $this->exec(function () use($id, $data) {
-            return $this->domain->modelClass()::query()->findOrFail($id)->fill($data)->save();
+        return $this->exec(function () use($data) {
+            return $this->domain->modelClass()::query()->findOrFail($data['id'])->fill($data)->save();
+        });
+    }
+
+    public function destroy(array $ids)
+    {
+        return $this->exec(function () use($ids) {
+            return $this->domain->modelClass()::destroy($ids);
         });
     }
 
