@@ -52,7 +52,7 @@ abstract class BaseController extends Controller
 
     public function all()
     {
-        return $this->entity()->repository()->all();
+        return $this->entity()->modelClass()::query()->paginate(9);
     }
 
     /**
