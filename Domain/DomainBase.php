@@ -12,8 +12,12 @@ abstract class DomainBase
 
     protected $repository;
 
+    public $cache_seconds = 60*60*2;
+
+    //ABSTRACT METHODS__________________________________________________________________________________________________
     /**@return string|Model*/
     public abstract function modelClass();
+    //__________________________________________________________________________________________________________________
 
     protected function repositoryClass() {
         return RepositoryBase::class;

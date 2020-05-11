@@ -4,6 +4,7 @@ namespace Modules\ModuleBase\Repository;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Modules\ModuleBase\Repository\RepositoryBaseAbstract;
 
 class RepositoryBase extends RepositoryBaseAbstract
@@ -21,34 +22,29 @@ class RepositoryBase extends RepositoryBaseAbstract
     public function all()
     {
         return $this->exec(function () {
-            $result = $this->domain->modelClass()::all();
+            $result = Cache::remember($this->getCacheKey(), $this->domain->cache_seconds, function() {
+                return $this->domain->modelClass()::all();
+            });
             $data['items'] = $result->toArray();
             $data['total'] = $result->count();
             return $data;
         });
     }
 
-    /**@return Response*/
     public function fill(array $data)
     {
-        return $this->exec(function () use ($data) {
-            return $this->model()->fill($data);
-        });
+        $this->model()->fill($data);
+        return  $this;
     }
 
-    /**@return Response*/
     public function create(array $data)
     {
-        return $this->exec(function () use ($data) {
-            return $this->model = $this->domain->modelClass()::query()->create($data);
-        });
+        return $this->domain->modelClass()::query()->create($data);
     }
 
     public function update($data)
     {
-        return $this->exec(function () use($data) {
-            return $this->domain->modelClass()::query()->findOrFail($data['id'])->fill($data)->save();
-        });
+        return $this->domain->modelClass()::query()->findOrFail($data['id'])->fill($data)->save();
     }
 
     public function destroy(array $ids)
@@ -58,12 +54,9 @@ class RepositoryBase extends RepositoryBaseAbstract
         });
     }
 
-    /**@return Response*/
     public function save()
     {
-        return $this->exec(function () {
-            return $this->model()->save();
-        });
+        return $this->model()->save();
     }
 
     /**@return Response*/
@@ -73,6 +66,11 @@ class RepositoryBase extends RepositoryBaseAbstract
             $model = $this->domain->modelClass();
             return $model::query()->findOrFail($id);
         });
+    }
+
+    public function response()
+    {
+        return response($this->model(), 200, ['application/json']);
     }
 
     /**@return Response*/
@@ -91,5 +89,24 @@ class RepositoryBase extends RepositoryBaseAbstract
             }
             return response($msg, 400, ['application/json']);
         }
+    }
+
+    public function paginate($per_page)
+    {
+        $cache_key = $this->getCacheKey();
+
+        return Cache::remember($cache_key, $this->domain->cache_seconds, function () use ($per_page){
+            return $this->model()::query()->paginate($per_page);
+        });
+    }
+
+    protected function getCacheKey(): string
+    {
+        $uri_collection = collect(explode('/', request()->getRequestUri()))->filter();
+        if ($uri_collection->first() == 'api') {
+            $uri_collection->shift();
+        }
+        $cache_key = $uri_collection->join('/');
+        return $cache_key;
     }
 }
