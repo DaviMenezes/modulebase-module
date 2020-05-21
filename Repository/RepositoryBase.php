@@ -5,7 +5,6 @@ namespace Modules\ModuleBase\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
-use Modules\ModuleBase\Repository\RepositoryBaseAbstract;
 
 class RepositoryBase extends RepositoryBaseAbstract
 {
